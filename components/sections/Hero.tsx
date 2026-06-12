@@ -1,6 +1,7 @@
 'use client';
 import { useRef, useEffect, useState, MouseEvent as ReactMouseEvent } from 'react';
 import { motion, useScroll, useTransform, useSpring, useInView } from 'framer-motion';
+import Link from 'next/link';
 
 /* ── Typing animation ── */
 const phrases = [
@@ -63,7 +64,6 @@ function StatCard({ value, label, index, scrollYProgress }: {
   value: string; label: string; index: number; scrollYProgress: any;
 }) {
   const cardRef  = useRef<HTMLDivElement>(null);
-  const inView   = useInView(cardRef, { once: true, margin: '-40px' });
   const [coords, setCoords]   = useState({ x: 50, y: 50 });
   const [hovered, setHovered] = useState(false);
 
@@ -85,7 +85,7 @@ function StatCard({ value, label, index, scrollYProgress }: {
     <motion.div
       style={{ x: cardX, rotateY: cardRY, opacity: cardOp, transformStyle: 'preserve-3d', perspective: '800px' }}
       initial={{ opacity: 0, y: 30, scale: 0.90 }}
-      animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.75, delay: 0.15 + index * 0.08, ease: [0.16, 1, 0.3, 1] }}
     >
       {/* Inner — hover interactions */}
@@ -253,11 +253,15 @@ export default function Hero() {
 
       {/* LAYER 4 — content */}
       <motion.div
-        variants={container} initial="hidden" animate="show"
         style={{ position: 'relative', zIndex: 10, textAlign: 'center', maxWidth: '960px', width: '100%', padding: '0 1.5rem', paddingTop: '80px', y: contentY, opacity: contentOp }}
       >
         {/* Eyebrow */}
-        <motion.div variants={line} style={{ marginBottom: '1.75rem' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+          style={{ marginBottom: '1.75rem' }}
+        >
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 16px', borderRadius: '9999px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', fontSize: '0.72rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.75)' }}>
             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 6px #22c55e', animation: 'pulse-soft 2s ease-in-out infinite' }} />
             Join 10k+ satisfied customers
@@ -265,42 +269,63 @@ export default function Hero() {
         </motion.div>
 
         {/* Headline */}
-        <motion.h1 variants={line} style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(3rem, 7.5vw, 7rem)', fontWeight: 800, lineHeight: 0.95, letterSpacing: '-0.03em', color: '#ffffff', marginBottom: '1.5rem' }}>
+        <motion.h1
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          style={{ fontFamily: 'var(--font-heading)', fontSize: 'clamp(3rem, 7.5vw, 7rem)', fontWeight: 800, lineHeight: 0.95, letterSpacing: '-0.03em', color: '#ffffff', marginBottom: '1.5rem' }}
+        >
           Humanizing the{' '}
           <span style={{ background: 'linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.55) 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Digital</span>
           {' '}World.
         </motion.h1>
 
         {/* Typewriter */}
-        <motion.div variants={line} style={{ fontFamily: 'var(--font-heading)', fontWeight: 500, fontSize: 'clamp(1.1rem, 2.5vw, 1.6rem)', letterSpacing: '-0.01em', color: 'rgba(255,255,255,0.7)', marginBottom: '2rem', height: '2.2em', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          style={{ fontFamily: 'var(--font-heading)', fontWeight: 500, fontSize: 'clamp(1.1rem, 2.5vw, 1.6rem)', letterSpacing: '-0.01em', color: 'rgba(255,255,255,0.7)', marginBottom: '2rem', height: '2.2em', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        >
           <TypingText />
         </motion.div>
 
         {/* CTAs */}
-        <motion.div variants={line} style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center', marginBottom: '3.5rem' }}>
-          <button
-            id="hero-cta-primary"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 32px', borderRadius: '9999px', background: '#ffffff', color: '#09090b', fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '0.875rem', letterSpacing: '0.01em', border: 'none', cursor: 'pointer', transition: 'transform 150ms ease, box-shadow 250ms ease' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 8px 30px rgba(255,255,255,0.2)'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = ''; (e.currentTarget as HTMLButtonElement).style.boxShadow = ''; }}
-          >
-            Let's Build Together
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-          </button>
-          <button
-            id="hero-cta-demo"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 32px', borderRadius: '9999px', background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.85)', fontFamily: 'var(--font-heading)', fontWeight: 600, fontSize: '0.875rem', letterSpacing: '0.01em', cursor: 'pointer', transition: 'transform 150ms ease, background 200ms ease' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.14)'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = ''; (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.08)'; }}
-          >
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden><circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5" /><path d="M6.5 5.5l4 2.5-4 2.5V5.5z" fill="currentColor" /></svg>
-            View Our Services
-          </button>
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
+          style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center', marginBottom: '3.5rem' }}
+        >
+          <Link href="/contact" passHref style={{ textDecoration: 'none' }}>
+            <button
+              id="hero-cta-primary"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 32px', borderRadius: '9999px', background: '#ffffff', color: '#09090b', fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '0.875rem', letterSpacing: '0.01em', border: 'none', cursor: 'pointer', transition: 'transform 150ms ease, box-shadow 250ms ease' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 8px 30px rgba(255,255,255,0.2)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = ''; (e.currentTarget as HTMLButtonElement).style.boxShadow = ''; }}
+            >
+              Let's Build Together
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            </button>
+          </Link>
+          <Link href="/services" passHref style={{ textDecoration: 'none' }}>
+            <button
+              id="hero-cta-demo"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 32px', borderRadius: '9999px', background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.85)', fontFamily: 'var(--font-heading)', fontWeight: 600, fontSize: '0.875rem', letterSpacing: '0.01em', cursor: 'pointer', transition: 'transform 150ms ease, background 200ms ease' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.14)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = ''; (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.08)'; }}
+            >
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden><circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.5" /><path d="M6.5 5.5l4 2.5-4 2.5V5.5z" fill="currentColor" /></svg>
+              View Our Services
+            </button>
+          </Link>
         </motion.div>
 
         {/* ── Stats row — premium cards ── */}
         <motion.div
-          variants={line}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
           style={{
             position: 'relative',
             maxWidth: '680px',
