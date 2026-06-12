@@ -1,7 +1,8 @@
 'use client';
 import PageLayout from '@/components/layout/PageLayout';
 import { FadeUp, StaggerList, StaggerItem } from '@/components/ui/ScrollReveal';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { useRef, useState, useEffect } from 'react';
 
 const B = '1px solid rgba(9,9,11,0.08)';
 const D = '#09090b';
@@ -15,11 +16,36 @@ const VALUES = [
 ];
 
 const TEAM = [
-  { name: 'Raja Muhammad Taha', initials: 'RT', role: 'CEO', bio: 'Leading the company towards success and innovation, shaping corporate strategy and ensuring client-centric execution.' },
-  { name: 'Muhammad Awais Attari', initials: 'MA', role: 'CTO', bio: 'Overseeing the technological development and strategy, building robust, scalable architectures for all digital products.' },
-  { name: 'Sabih ul Hassan', initials: 'SH', role: 'CMO', bio: 'Driving marketing strategies, search engine optimization, and brand awareness to help businesses scale globally.' },
-  { name: 'Muhammad Talah', initials: 'MT', role: 'Graphic Designer', bio: 'Creating visually stunning, brand-aligned interfaces and design assets that shape and enhance digital identity.' },
-  { name: 'Saim Iftikhar', initials: 'SI', role: 'AI Engineer', bio: 'Developing intelligent solutions, LLM workflows, and custom automation pipelines to enhance operational efficiency.' },
+  { 
+    name: 'Raja Muhammad Taha', 
+    role: 'CEO & Founder', 
+    bio: 'Leading the company towards success and innovation, shaping corporate strategy and ensuring client-centric execution.',
+    img: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Raja&mouth=smile&eyebrows=defaultNatural'
+  },
+  { 
+    name: 'Muhammad Awais Attari', 
+    role: 'CTO', 
+    bio: 'Overseeing the technological development and strategy, building robust, scalable architectures for all digital products.',
+    img: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Awais&eyebrows=default&mouth=default'
+  },
+  { 
+    name: 'Sabih ul Hassan', 
+    role: 'CMO', 
+    bio: 'Driving marketing strategies, search engine optimization, and brand awareness to help businesses scale globally.',
+    img: '/assets/sabih.png'
+  },
+  { 
+    name: 'Muhammad Talah', 
+    role: 'Graphic Designer', 
+    bio: 'Creating visually stunning, brand-aligned interfaces and design assets that shape and enhance digital identity.',
+    img: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Talah&mouth=smile&top=shortHair'
+  },
+  { 
+    name: 'Saim Iftikhar', 
+    role: 'AI Engineer', 
+    bio: 'Developing intelligent solutions, LLM workflows, and custom automation pipelines to enhance operational efficiency.',
+    img: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Saim&top=frizzle&mouth=smile'
+  },
 ];
 
 const STATS = [
@@ -30,6 +56,24 @@ const STATS = [
 ];
 
 export default function AboutPage() {
+  const [isMobile, setIsMobile] = useState(false);
+  const targetRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const { scrollYProgress } = useScroll({
+    target: targetRef,
+  });
+
+  // Calculate translation range for horizontal scroll
+  // We translate x from 0% to a negative percentage to show all cards.
+  const x = useTransform(scrollYProgress, [0, 1], ["0%", "-62%"]);
+
   return (
     <PageLayout
       eyebrow="About DevNexa"
@@ -103,30 +147,164 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Team */}
-      <section className="section" style={{ background: '#faf9f6', borderTop: B }}>
-        <div className="dn-container">
-          <FadeUp margin="-80px" style={{ marginBottom: '3.5rem' }}>
-            <p className="eyebrow" style={{ marginBottom: '1rem' }}>The team</p>
-            <h2 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: 'clamp(1.8rem, 3vw, 3rem)', letterSpacing: '-0.04em', color: D, marginBottom: '1rem' }}>People behind the work</h2>
-            <p style={{ fontSize: '1rem', color: 'rgba(9,9,11,0.55)', lineHeight: 1.72, maxWidth: '640px' }}>
-              A collaborative team of problem solvers and creators combining backend development, user experience design, marketing, and technical excellence to exceed client expectations.
-            </p>
-          </FadeUp>
-          <StaggerList stagger={0.07} margin="-80px" style={{ display: 'grid', gap: '1.5rem' }} className="team-grid">
-            {TEAM.map(p => (
-              <StaggerItem key={p.name}>
-                <motion.div whileHover={{ y: -4 }} transition={{ type: 'spring', stiffness: 300, damping: 22 }} style={{ border: B, borderRadius: '16px', padding: '2rem', background: '#fff', height: '100%' }}>
-                  <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: D, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '1.15rem', marginBottom: '1.25rem' }}>{p.initials}</div>
-                  <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '1.125rem', letterSpacing: '-0.02em', color: D, marginBottom: '2px' }}>{p.name}</h3>
-                  <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(9,9,11,0.4)', marginBottom: '0.875rem' }}>{p.role}</p>
-                  <p style={{ fontSize: '0.875rem', color: 'rgba(9,9,11,0.55)', lineHeight: 1.72 }}>{p.bio}</p>
-                </motion.div>
-              </StaggerItem>
-            ))}
-          </StaggerList>
-        </div>
-      </section>
+      {/* Team Section */}
+      {isMobile ? (
+        <section className="section" style={{ background: '#faf9f6', borderTop: B }}>
+          <div className="dn-container">
+            <FadeUp margin="-80px" style={{ marginBottom: '3.5rem' }}>
+              <p className="eyebrow" style={{ marginBottom: '1rem' }}>The team</p>
+              <h2 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: 'clamp(1.8rem, 3vw, 3rem)', letterSpacing: '-0.04em', color: D, marginBottom: '1rem' }}>People behind the work</h2>
+              <p style={{ fontSize: '1.05rem', color: 'rgba(9,9,11,0.55)', lineHeight: 1.72, maxWidth: '640px' }}>
+                A collaborative team of problem solvers and creators combining backend development, user experience design, marketing, and technical excellence to exceed client expectations.
+              </p>
+            </FadeUp>
+            <StaggerList stagger={0.07} margin="-80px" style={{ display: 'grid', gap: '2rem' }} className="team-grid">
+              {TEAM.map(p => (
+                <StaggerItem key={p.name}>
+                  <motion.div 
+                    whileHover={{ y: -6 }} 
+                    transition={{ type: 'spring', stiffness: 300, damping: 22 }} 
+                    style={{ 
+                      border: B, 
+                      borderRadius: '24px', 
+                      padding: '2.5rem', 
+                      background: '#fff', 
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      position: 'relative',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <div style={{ height: '220px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', background: 'linear-gradient(180deg, rgba(9,9,11,0.02) 0%, rgba(9,9,11,0) 100%)', borderRadius: '16px', overflow: 'hidden', marginBottom: '1.5rem' }}>
+                      <img src={p.img} alt={p.name} style={{ width: '180px', height: '180px', objectFit: 'contain', filter: 'drop-shadow(0 10px 15px rgba(0,0,0,0.08))' }} />
+                    </div>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(9,9,11,0.4)', background: 'rgba(9,9,11,0.04)', padding: '4px 10px', borderRadius: '9999px', display: 'inline-block', marginBottom: '8px', alignSelf: 'flex-start' }}>{p.role}</span>
+                    <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '1.3rem', letterSpacing: '-0.02em', color: D, marginBottom: '6px' }}>{p.name}</h3>
+                    <p style={{ fontSize: '0.9rem', color: 'rgba(9,9,11,0.55)', lineHeight: 1.72 }}>{p.bio}</p>
+                  </motion.div>
+                </StaggerItem>
+              ))}
+            </StaggerList>
+          </div>
+        </section>
+      ) : (
+        <section ref={targetRef} style={{ position: 'relative', height: '260vh', background: '#faf9f6', borderTop: B }}>
+          <div style={{ position: 'sticky', top: 0, height: '100vh', display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
+            <motion.div style={{ x, display: 'flex', gap: '4rem', padding: '0 8vw', alignItems: 'center' }}>
+              
+              {/* Header column */}
+              <div style={{ width: '420px', flexShrink: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', marginRight: '2rem' }}>
+                <p className="eyebrow" style={{ marginBottom: '1rem' }}>The team</p>
+                <h2 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: 'clamp(2.5rem, 4vw, 3.8rem)', letterSpacing: '-0.04em', color: D, marginBottom: '1.5rem', lineHeight: 1.05 }}>
+                  People behind<br />the work
+                </h2>
+                <p style={{ fontSize: '1.05rem', color: 'rgba(9,9,11,0.55)', lineHeight: 1.75 }}>
+                  A collaborative team of problem solvers and creators combining backend development, user experience design, marketing, and technical excellence to exceed client expectations.
+                </p>
+              </div>
+
+              {/* Members */}
+              {TEAM.map((p) => (
+                <div
+                  key={p.name}
+                  style={{
+                    width: '380px',
+                    height: '520px',
+                    flexShrink: 0,
+                    position: 'relative',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-end',
+                    background: '#ffffff',
+                    border: B,
+                    borderRadius: '28px',
+                    padding: '2.5rem',
+                    overflow: 'visible',
+                    boxShadow: '0 4px 30px rgba(0,0,0,0.01)',
+                  }}
+                >
+                  {/* Photo container that overflows nicely */}
+                  <div 
+                    style={{ 
+                      position: 'absolute', 
+                      top: '-60px', 
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: '320px', 
+                      height: '320px', 
+                      display: 'flex',
+                      alignItems: 'flex-end',
+                      justifyContent: 'center',
+                      overflow: 'visible',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    <motion.img 
+                      src={p.img}
+                      alt={p.name}
+                      whileHover={{ scale: 1.1, y: -8 }}
+                      transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                      style={{
+                        width: '300px',
+                        height: '300px',
+                        objectFit: 'contain',
+                        filter: 'drop-shadow(0 25px 30px rgba(0,0,0,0.12))',
+                        transformOrigin: 'bottom center',
+                        pointerEvents: 'auto',
+                      }}
+                    />
+                  </div>
+
+                  {/* Card Info details with best typography */}
+                  <div style={{ position: 'relative', zIndex: 10, marginTop: '220px' }}>
+                    <span 
+                      style={{ 
+                        fontFamily: 'var(--font-mono)', 
+                        fontSize: '0.625rem', 
+                        letterSpacing: '0.14em', 
+                        textTransform: 'uppercase', 
+                        color: 'rgba(9,9,11,0.4)',
+                        background: 'rgba(9,9,11,0.04)',
+                        padding: '4px 10px',
+                        borderRadius: '9999px',
+                        display: 'inline-block',
+                        marginBottom: '12px'
+                      }}
+                    >
+                      {p.role}
+                    </span>
+                    
+                    <h3 
+                      style={{ 
+                        fontFamily: 'var(--font-heading)', 
+                        fontWeight: 700, 
+                        fontSize: '1.45rem', 
+                        letterSpacing: '-0.03em', 
+                        color: D, 
+                        marginBottom: '8px' 
+                      }}
+                    >
+                      {p.name}
+                    </h3>
+                    
+                    <p 
+                      style={{ 
+                        fontSize: '0.875rem', 
+                        color: 'rgba(9,9,11,0.52)', 
+                        lineHeight: 1.65,
+                        margin: 0
+                      }}
+                    >
+                      {p.bio}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+      )}
 
       <style>{`
         .team-grid { grid-template-columns: repeat(3, 1fr) !important; }

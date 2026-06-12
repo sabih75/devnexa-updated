@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useState, useRef, Suspense } from 'react';
 import type { MouseEvent as ReactMouseEvent } from 'react';
 import { FadeUp } from '@/components/ui/ScrollReveal';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 const B = '1px solid rgba(9,9,11,0.08)';
@@ -112,6 +112,7 @@ function ContactFormInner() {
   const [feedbackMessage, setFeedbackMessage] = useState('');
 
   const searchParams = useSearchParams();
+  const router = useRouter();
   const rawService = searchParams.get('service') || '';
   const rawProject = searchParams.get('project') || '';
   const rawRole = searchParams.get('role') || '';
@@ -128,12 +129,13 @@ function ContactFormInner() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const form = e.currentTarget;
     setStatus('sending');
     setErrorMessage('');
     setIsMock(false);
     setFeedbackMessage('');
 
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(form);
     const data = {
       name: formData.get('name'),
       email: formData.get('email'),
@@ -195,6 +197,8 @@ function ContactFormInner() {
         if (directRes.ok && w3fData.success) {
           setStatus('sent');
           setIsMock(false);
+          form.reset();
+          router.push('/?contact-success=true');
           return;
         } else {
           throw new Error(w3fData.message || 'Direct submission to Web3Forms failed.');
@@ -216,6 +220,8 @@ function ContactFormInner() {
         throw new Error(text || `Server returned error status: ${res.status}`);
       }
       setStatus('sent');
+      form.reset();
+      router.push('/?contact-success=true');
     } catch (err: any) {
       console.error(err);
       setStatus('error');

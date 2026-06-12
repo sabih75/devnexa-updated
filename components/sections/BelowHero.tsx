@@ -410,7 +410,7 @@ function CTA() {
           </p>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center', alignItems: 'center' }}>
-            <a
+            <Link
               href="/contact"
               style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 32px', borderRadius: '9999px', background: D, color: '#ffffff', fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '0.9375rem', textDecoration: 'none', transition: 'transform 150ms ease, box-shadow 250ms ease', cursor: 'pointer' }}
               onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 10px 32px rgba(9,9,11,0.2)'; }}
@@ -420,15 +420,15 @@ function CTA() {
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
                 <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-            </a>
-            <a
-              href="#our-work"
+            </Link>
+            <Link
+              href="/our-work"
               style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 32px', borderRadius: '9999px', border: '1px solid rgba(9,9,11,0.15)', color: 'rgba(9,9,11,0.7)', fontFamily: 'var(--font-heading)', fontWeight: 600, fontSize: '0.9375rem', textDecoration: 'none', transition: 'transform 150ms ease, background 200ms ease', cursor: 'pointer' }}
               onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.transform = 'translateY(-2px)'; (e.currentTarget as HTMLAnchorElement).style.background = 'rgba(9,9,11,0.04)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.transform = ''; (e.currentTarget as HTMLAnchorElement).style.background = ''; }}
             >
               See our work
-            </a>
+            </Link>
           </div>
 
           <p style={{ marginTop: '2rem', fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'rgba(9,9,11,0.36)', letterSpacing: '0.06em' }}>

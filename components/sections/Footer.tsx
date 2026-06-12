@@ -3,6 +3,8 @@ import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import LogoMark from '@/components/ui/Logo';
 
+import Link from 'next/link';
+
 export default function Footer() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-10%' });
@@ -54,15 +56,15 @@ export default function Footer() {
               justifyContent: 'center',
               marginBottom: '4.5rem',
             }}>
-              <button className="btn btn-primary" id="footer-cta-primary">
+              <Link href="/contact" className="btn btn-primary" id="footer-cta-primary" style={{ textDecoration: 'none' }}>
                 Get started free
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
                   <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-              </button>
-              <button className="btn btn-ghost" id="footer-cta-sales">
+              </Link>
+              <Link href="/contact" className="btn btn-ghost" id="footer-cta-sales" style={{ textDecoration: 'none' }}>
                 Contact sales
-              </button>
+              </Link>
             </div>
 
             {/* Platform compatibility badges */}
@@ -139,22 +141,33 @@ export default function Footer() {
                   {col.title}
                 </div>
                 <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', listStyle: 'none', padding: 0 }}>
-                  {col.links.map((link) => (
-                    <li key={link}>
-                      <a
-                        href="#"
-                        style={{
-                          color: 'rgba(9,9,11,0.5)',
-                          fontSize: '0.8125rem',
-                          transition: 'color 150ms ease',
-                        }}
-                        onMouseEnter={e => e.currentTarget.style.color = '#000000'}
-                        onMouseLeave={e => e.currentTarget.style.color = 'rgba(9,9,11,0.5)'}
-                      >
-                        {link}
-                      </a>
-                    </li>
-                  ))}
+                  {col.links.map((link) => {
+                    let href = '/';
+                    if (link === 'About Us') href = '/about';
+                    else if (link === 'Careers') href = '/career';
+                    else if ([
+                      'Features', 'Observability', 'Previews', 'CLI Tools', 
+                      'SDKs', 'GitHub App', 'Integrations', 'Documentation'
+                    ].includes(link)) href = '/services';
+                    
+                    return (
+                      <li key={link}>
+                        <Link
+                          href={href}
+                          style={{
+                            color: 'rgba(9,9,11,0.5)',
+                            fontSize: '0.8125rem',
+                            transition: 'color 150ms ease',
+                            textDecoration: 'none',
+                          }}
+                          onMouseEnter={e => e.currentTarget.style.color = '#000000'}
+                          onMouseLeave={e => e.currentTarget.style.color = 'rgba(9,9,11,0.5)'}
+                        >
+                          {link}
+                        </Link>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             ))}
