@@ -173,10 +173,16 @@ export default function Footer() {
               © 2026 DevNexa Inc. All rights reserved.
             </p>
             <div style={{ display: 'flex', gap: '1.5rem', marginLeft: 'auto' }}>
-              {['GitHub', 'Twitter / X', 'Discord', 'LinkedIn'].map((s) => (
+              {[
+                { name: 'LinkedIn', href: 'https://www.linkedin.com/company/devnexa/' },
+                { name: 'Instagram', href: 'https://www.instagram.com/devnexaofficial' },
+                { name: 'Discord', href: '#' }
+              ].map((s) => (
                 <a
-                  key={s}
-                  href="#"
+                  key={s.name}
+                  href={s.href}
+                  target={s.href !== '#' ? '_blank' : undefined}
+                  rel={s.href !== '#' ? 'noopener noreferrer' : undefined}
                   style={{
                     color: 'rgba(9,9,11,0.4)',
                     fontSize: '0.75rem',
@@ -185,7 +191,7 @@ export default function Footer() {
                   onMouseEnter={e => e.currentTarget.style.color = '#000000'}
                   onMouseLeave={e => e.currentTarget.style.color = 'rgba(9,9,11,0.4)'}
                 >
-                  {s}
+                  {s.name}
                 </a>
               ))}
             </div>
