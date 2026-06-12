@@ -78,17 +78,17 @@ function StatCard({ value, label, index, scrollYProgress }: {
   const ryOff = [-8,      -2.5,    2.5,     8    ][index];
   const cardX  = useTransform(scrollYProgress, [0, 0.55], ['0px', xOff]);
   const cardRY = useTransform(scrollYProgress, [0, 0.55], [0, ryOff]);
-  const cardOp = useTransform(scrollYProgress, [0.3, 0.65], [1, 0]);
+  const cardOp = useTransform(scrollYProgress, [0, 0.35, 0.65], [1, 1, 0], { clamp: true });
 
   return (
-    /* Outer — handles scroll 3D + entry fade */
+    /* Outer — handles entry fade */
     <motion.div
-      style={{ x: cardX, rotateY: cardRY, opacity: cardOp, transformStyle: 'preserve-3d', perspective: '800px' }}
       initial={{ opacity: 0, y: 30, scale: 0.90 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.75, delay: 0.15 + index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+      style={{ transformStyle: 'preserve-3d', perspective: '800px' }}
     >
-      {/* Inner — hover interactions */}
+      {/* Inner — hover interactions & scroll link */}
       <motion.div
         ref={cardRef}
         onMouseMove={onMove}
@@ -111,6 +111,9 @@ function StatCard({ value, label, index, scrollYProgress }: {
           height: '100%',
           background: hovered ? 'rgba(255,255,255,0.075)' : 'rgba(255,255,255,0.03)',
           transition: 'background 320ms ease',
+          x: cardX,
+          rotateY: cardRY,
+          opacity: cardOp,
         }}
       >
         {/* Radial cursor spotlight */}
