@@ -176,7 +176,7 @@ export default function Footer() {
               {[
                 { name: 'LinkedIn', href: 'https://www.linkedin.com/company/devnexa/' },
                 { name: 'Instagram', href: 'https://www.instagram.com/devnexaofficial' },
-                { name: 'Discord', href: '#' }
+                { name: 'Facebook', href: '#' }
               ].map((s) => (
                 <a
                   key={s.name}
