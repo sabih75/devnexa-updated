@@ -6,6 +6,11 @@ export const metadata: Metadata = {
   title: 'DevNexa — Build. Scale. Ship.',
   description:
     'DevNexa is the premium developer platform for teams who move fast. Ship production-grade software with elegant tools and seamless workflows.',
+  icons: {
+    icon: '/logo.png',
+    shortcut: '/logo.png',
+    apple: '/logo.png',
+  },
   openGraph: {
     title: 'DevNexa — Build. Scale. Ship.',
     description: 'Premium developer platform for teams who move fast.',
