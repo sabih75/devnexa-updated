@@ -107,14 +107,14 @@ export default function CustomCursor() {
           translateY: '-50%',
           pointerEvents: 'none',
           zIndex: 99999,
-          mixBlendMode: isHovered ? 'normal' : 'difference',
+          mixBlendMode: 'normal',
           borderStyle: 'solid',
         }}
         animate={{
           width: isHovered ? 48 : 30,
           height: isHovered ? 48 : 30,
-          borderColor: isHovered ? '#10b981' : '#ffffff',
-          borderWidth: isHovered ? '1.5px' : '1px',
+          borderColor: isHovered ? 'rgba(37, 99, 235, 0.8)' : 'rgba(37, 99, 235, 0.35)',
+          borderWidth: isHovered ? '2px' : '1.5px',
           scale: isClicking ? 0.85 : 1,
           opacity: mounted && isVisible ? 1 : 0,
         }}
@@ -139,12 +139,12 @@ export default function CustomCursor() {
           translateY: '-50%',
           pointerEvents: 'none',
           zIndex: 99999,
-          mixBlendMode: isHovered ? 'normal' : 'difference',
+          mixBlendMode: 'normal',
         }}
         animate={{
           width: isHovered ? 8 : 6,
           height: isHovered ? 8 : 6,
-          backgroundColor: isHovered ? '#10b981' : '#ffffff',
+          backgroundColor: '#2563eb',
           scale: isClicking ? 1.6 : 1,
           opacity: mounted && isVisible ? 1 : 0,
         }}
