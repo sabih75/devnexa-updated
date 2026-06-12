@@ -209,7 +209,16 @@ function useMouseTilt(strength = 12) {
 ═══════════════════════════════ */
 export default function Hero() {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const videoRef   = useRef<HTMLVideoElement>(null);
+  const [isMuted, setIsMuted] = useState(true);
   const tilt = useMouseTilt(8);
+
+  const toggleMuted = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      setIsMuted(videoRef.current.muted);
+    }
+  };
 
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] });
 
@@ -231,7 +240,7 @@ export default function Hero() {
     >
       {/* LAYER 1 — video */}
       <motion.div aria-hidden style={{ position: 'absolute', inset: '-10% -5%', y: videoYSpring, rotateX: tilt.x, rotateY: tilt.y, willChange: 'transform', transformStyle: 'preserve-3d' }}>
-        <video autoPlay loop muted playsInline preload="auto" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}>
+        <video ref={videoRef} autoPlay loop muted={isMuted} playsInline preload="auto" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}>
           <source src="/videos/hero-video.mp4" type="video/mp4" />
         </video>
       </motion.div>
@@ -333,6 +342,45 @@ export default function Hero() {
           style={{ width: '1px', height: '40px', background: 'linear-gradient(to bottom, rgba(255,255,255,0.5), transparent)' }}
         />
       </motion.div>
+
+      {/* Sound Toggle Button */}
+      <div style={{ position: 'absolute', bottom: '2rem', right: '2rem', zIndex: 30 }}>
+        <button
+          onClick={toggleMuted}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '44px',
+            height: '44px',
+            borderRadius: '50%',
+            background: 'rgba(255, 255, 255, 0.08)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            color: 'rgba(255, 255, 255, 0.85)',
+            cursor: 'pointer',
+            transition: 'transform 150ms ease, background 200ms ease',
+            outline: 'none',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08)'; e.currentTarget.style.background = 'rgba(255, 255, 255, 0.14)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'; }}
+          aria-label={isMuted ? 'Unmute background video' : 'Mute background video'}
+        >
+          {isMuted ? (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+              <line x1="23" y1="9" x2="17" y2="15" />
+              <line x1="17" y1="9" x2="23" y2="15" />
+            </svg>
+          ) : (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+            </svg>
+          )}
+        </button>
+      </div>
 
       <style>{`
         @keyframes cursor-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }

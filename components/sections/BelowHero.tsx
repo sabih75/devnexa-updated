@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import type { MouseEvent as ReactMouseEvent } from 'react';
 import { motion } from 'framer-motion';
 import { FadeUp, StaggerList, StaggerItem } from '@/components/ui/ScrollReveal';
+import Link from 'next/link';
 
 /* ── Design tokens ─────────────────────────────── */
 const D = '#09090b';          // charcoal
@@ -23,7 +24,7 @@ const icons = {
   ),
   layers: (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
+      <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 17 22 12"/>
     </svg>
   ),
   zap: (
@@ -51,15 +52,25 @@ const icons = {
       <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
     </svg>
   ),
+  search: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+  ),
+  fileText: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+    </svg>
+  ),
 };
 
 /* ══════════════════════════════════════════════════
    TICKER
 ══════════════════════════════════════════════════ */
 const TICKER_ITEMS = [
-  'Web Development','Mobile Apps','SaaS Platforms','AI Automation',
-  'Brand Identity','UI / UX Design','SEO & Content','Digital Marketing',
-  'Outsourcing','Cloud Solutions','E-Commerce','CRM & ERP',
+  'Web Development','Mobile Development','Branding','Digital Marketing',
+  'SEO','End-to-End Dev','Content Writing','AI Solutions',
+  'Veterinary Digital Tech','Business Transformation',
 ];
 
 function Ticker() {
@@ -86,14 +97,14 @@ function Ticker() {
    SERVICES
 ══════════════════════════════════════════════════ */
 const SERVICES = [
-  { icon: icons.globe,     accent: '#3b82f6', title: 'Web Development',      desc: 'Blazing-fast websites and web apps—from landing pages to complex portals—built to convert and scale.', tags: ['React', 'Next.js', 'Laravel', 'WordPress'] },
-  { icon: icons.smartphone,accent: '#8b5cf6', title: 'Mobile Apps',           desc: 'Cross-platform iOS & Android apps that feel native, perform flawlessly, and scale effortlessly.',       tags: ['React Native', 'Flutter', 'Expo'] },
-  { icon: icons.layers,    accent: '#10b981', title: 'SaaS Development',      desc: 'End-to-end SaaS platforms: multi-tenancy, auth, billing, dashboards, and full API layers.',             tags: ['Multi-tenant', 'Stripe', 'Subscriptions'], highlight: true },
-  { icon: icons.zap,       accent: '#f59e0b', title: 'AI & Automation',       desc: 'Custom AI agents, chatbots, workflow automation, scraping pipelines, and LLM integrations.',            tags: ['LLM', 'n8n', 'Make', 'Python'] },
-  { icon: icons.pen,       accent: '#ec4899', title: 'Branding & UI/UX',      desc: 'Logos, design systems, and interfaces that make people feel something—and trust you enough to act.',     tags: ['Figma', 'Brand Identity', 'Design Systems'] },
-  { icon: icons.trending,  accent: '#f97316', title: 'Digital Marketing',     desc: 'Organic growth, paid ads, content strategy, and social media management that drives real traffic.',      tags: ['SEO', 'Google Ads', 'Meta Ads', 'Content'] },
-  { icon: icons.users,     accent: '#06b6d4', title: 'Outsourcing & Teams',   desc: 'Dedicated developers, designers, or marketers long-term—vetted talent that integrates with your workflow.', tags: ['Dedicated Teams', 'Staff Aug', 'White Label'] },
-  { icon: icons.cloud,     accent: '#6366f1', title: 'Cloud, CRM & ERP',      desc: 'Cloud migrations, CRM customisation, and ERP integrations that eliminate operational chaos entirely.',    tags: ['AWS', 'HubSpot', 'Odoo', 'Firebase'] },
+  { icon: icons.globe,     accent: '#3b82f6', title: 'Web Development',      desc: 'High-performance, modern websites designed to convert visitors and serve as the digital foundation for your veterinary clinic or business.', tags: ['Next.js', 'React', 'WordPress', 'Clinic Portals'] },
+  { icon: icons.smartphone,accent: '#8b5cf6', title: 'Mobile Development',   desc: 'Feature-rich, native-feeling iOS and Android applications engineered for seamless performance and maximum engagement.', tags: ['React Native', 'Flutter', 'Mobile UX'] },
+  { icon: icons.pen,       accent: '#ec4899', title: 'Branding',             desc: 'Memorable brand identities, logos, guidelines, and visual assets built to communicate trust and authority in your industry.', tags: ['Figma', 'Logo Design', 'Visual Identity'] },
+  { icon: icons.trending,  accent: '#f97316', title: 'Digital Marketing',     desc: 'Data-driven paid ads, social campaigns, and strategic funnels built to connect veterinary practices and businesses with their target audience.', tags: ['Google Ads', 'Meta Ads', 'Analytics'] },
+  { icon: icons.search,    accent: '#10b981', title: 'SEO',                  desc: 'Strategic local and global search engine optimization designed to rank your services at the top of Google and attract high-intent clients.', tags: ['Local SEO', 'Technical SEO', 'Keyword Strategy'] },
+  { icon: icons.layers,    accent: '#6366f1', title: 'End-to-End Development',desc: 'Complete software development ownership—from initial wireframing and database architecture to final testing and cloud deployment.', tags: ['Full Stack', 'APIs', 'Cloud Deploy'], highlight: true },
+  { icon: icons.fileText,  accent: '#06b6d4', title: 'Content Writing',      desc: 'Expert copywriting and informative content tailored to educate pet owners and clients, building trust and driving website conversions.', tags: ['Copywriting', 'SEO Blog', 'Technical Copy'] },
+  { icon: icons.zap,       accent: '#f59e0b', title: 'AI Solutions',         desc: 'Intelligent automation, custom AI agents, and workflow integrations built to optimize operations and reduce repetitive overhead.', tags: ['AI Agents', 'n8n Workflows', 'LLMs'] },
 ];
 
 function ServiceCard({ s, i }: { s: typeof SERVICES[0]; i: number }) {
@@ -107,130 +118,134 @@ function ServiceCard({ s, i }: { s: typeof SERVICES[0]; i: number }) {
     setCoords({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 });
   };
 
+  const slug = s.title.toLowerCase().replace(/ & /g, '-').replace(/\s+/g, '-');
+
   return (
     <FadeUp delay={i * 0.04} margin="-80px" style={{ height: '100%' }}>
-      <motion.div
-        ref={cardRef}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        onMouseMove={onMove}
-        animate={{
-          backgroundColor: hovered ? `rgba(${hexToRgb(s.accent)}, 0.035)` : '#ffffff',
-        }}
-        transition={{ duration: 0.35 }}
-        style={{
-          position: 'relative', height: '100%', padding: '1.875rem',
-          display: 'flex', flexDirection: 'column', gap: '1.125rem',
-          cursor: 'default', overflow: 'hidden',
-        }}
-      >
-        {/* ── cursor-tracking neon spotlight ── */}
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute', inset: 0, pointerEvents: 'none',
-            opacity: hovered ? 1 : 0,
-            transition: 'opacity 400ms ease',
-            background: `radial-gradient(320px circle at ${coords.x}% ${coords.y}%, rgba(${hexToRgb(s.accent)}, 0.13) 0%, transparent 65%)`,
-          }}
-        />
-
-        {/* ── corner neon bloom ── */}
+      <Link href={`/services/${slug}`} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
         <motion.div
-          aria-hidden
-          animate={{ opacity: hovered ? 1 : 0, scale: hovered ? 1 : 0.7 }}
-          transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-          style={{
-            position: 'absolute', top: '-40px', left: '-40px',
-            width: '220px', height: '220px', borderRadius: '50%',
-            background: `radial-gradient(circle, rgba(${hexToRgb(s.accent)}, 0.18) 0%, transparent 70%)`,
-            filter: 'blur(28px)', pointerEvents: 'none',
-          }}
-        />
-
-        {/* ── top accent border glow ── */}
-        <motion.div
-          aria-hidden
-          animate={{ opacity: hovered ? 1 : 0 }}
-          transition={{ duration: 0.3 }}
-          style={{
-            position: 'absolute', top: 0, left: '8%', right: '8%', height: '1.5px',
-            background: `linear-gradient(90deg, transparent, ${s.accent}cc, transparent)`,
-            pointerEvents: 'none',
-          }}
-        />
-
-        {/* ── shimmer sweep ── */}
-        <motion.div
-          aria-hidden
-          initial={{ x: '-120%', opacity: 0 }}
-          animate={hovered ? { x: '260%', opacity: 0.08 } : { x: '-120%', opacity: 0 }}
-          transition={{ duration: 0.75, ease: 'easeInOut' }}
-          style={{
-            position: 'absolute', top: 0, left: 0,
-            width: '50%', height: '100%', pointerEvents: 'none',
-            background: `linear-gradient(105deg, transparent 15%, rgba(${hexToRgb(s.accent)}, 0.55) 50%, transparent 85%)`,
-            transform: 'skewX(-14deg)',
-          }}
-        />
-
-        {/* ── Popular badge ── */}
-        {s.highlight && (
-          <motion.span
-            animate={{ background: hovered ? s.accent : D }}
-            transition={{ duration: 0.3 }}
-            style={{ position: 'absolute', top: '1rem', right: '1rem', fontSize: '0.58rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#fff', padding: '3px 10px', borderRadius: '9999px' }}
-          >
-            Popular
-          </motion.span>
-        )}
-
-        {/* ── Coloured icon box ── */}
-        <motion.div
+          ref={cardRef}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+          onMouseMove={onMove}
           animate={{
-            backgroundColor: hovered ? `rgba(${hexToRgb(s.accent)}, 0.14)` : 'rgba(9,9,11,0.04)',
-            borderColor:     hovered ? `rgba(${hexToRgb(s.accent)}, 0.45)` : 'rgba(9,9,11,0.08)',
-            boxShadow:       hovered ? `0 0 20px rgba(${hexToRgb(s.accent)}, 0.35), 0 0 6px rgba(${hexToRgb(s.accent)}, 0.2)` : '0 0 0 transparent',
+            backgroundColor: hovered ? `rgba(${hexToRgb(s.accent)}, 0.035)` : '#ffffff',
           }}
           transition={{ duration: 0.35 }}
           style={{
-            width: '46px', height: '46px', borderRadius: '13px',
-            border: '1px solid rgba(9,9,11,0.08)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: s.accent, flexShrink: 0,
+            position: 'relative', height: '100%', padding: '1.875rem',
+            display: 'flex', flexDirection: 'column', gap: '1.125rem',
+            cursor: 'pointer', overflow: 'hidden',
           }}
         >
-          {s.icon}
-        </motion.div>
+          {/* ── cursor-tracking neon spotlight ── */}
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute', inset: 0, pointerEvents: 'none',
+              opacity: hovered ? 1 : 0,
+              transition: 'opacity 400ms ease',
+              background: `radial-gradient(320px circle at ${coords.x}% ${coords.y}%, rgba(${hexToRgb(s.accent)}, 0.13) 0%, transparent 65%)`,
+            }}
+          />
 
-        <div style={{ flex: 1 }}>
-          <motion.h3
-            animate={{ color: hovered ? s.accent : D }}
-            transition={{ duration: 0.25 }}
-            style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '1.0625rem', letterSpacing: '-0.02em', marginBottom: '0.5rem', lineHeight: 1.25 }}
-          >
-            {s.title}
-          </motion.h3>
-          <p style={{ fontSize: '0.8125rem', color: 'rgba(9,9,11,0.55)', lineHeight: 1.7 }}>{s.desc}</p>
-        </div>
+          {/* ── corner neon bloom ── */}
+          <motion.div
+            aria-hidden
+            animate={{ opacity: hovered ? 1 : 0, scale: hovered ? 1 : 0.7 }}
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              position: 'absolute', top: '-40px', left: '-40px',
+              width: '220px', height: '220px', borderRadius: '50%',
+              background: `radial-gradient(circle, rgba(${hexToRgb(s.accent)}, 0.18) 0%, transparent 70%)`,
+              filter: 'blur(28px)', pointerEvents: 'none',
+            }}
+          />
 
-        {/* ── Coloured tags on hover ── */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem', paddingTop: '0.25rem' }}>
-          {s.tags.map(t => (
+          {/* ── top accent border glow ── */}
+          <motion.div
+            aria-hidden
+            animate={{ opacity: hovered ? 1 : 0 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              position: 'absolute', top: 0, left: '8%', right: '8%', height: '1.5px',
+              background: `linear-gradient(90deg, transparent, ${s.accent}cc, transparent)`,
+              pointerEvents: 'none',
+            }}
+          />
+
+          {/* ── shimmer sweep ── */}
+          <motion.div
+            aria-hidden
+            initial={{ x: '-120%', opacity: 0 }}
+            animate={hovered ? { x: '260%', opacity: 0.08 } : { x: '-120%', opacity: 0 }}
+            transition={{ duration: 0.75, ease: 'easeInOut' }}
+            style={{
+              position: 'absolute', top: 0, left: 0,
+              width: '50%', height: '100%', pointerEvents: 'none',
+              background: `linear-gradient(105deg, transparent 15%, rgba(${hexToRgb(s.accent)}, 0.55) 50%, transparent 85%)`,
+              transform: 'skewX(-14deg)',
+            }}
+          />
+
+          {/* ── Popular badge ── */}
+          {s.highlight && (
             <motion.span
-              key={t}
-              animate={{
-                borderColor: hovered ? `rgba(${hexToRgb(s.accent)}, 0.4)` : 'rgba(9,9,11,0.08)',
-                color:       hovered ? s.accent : 'rgba(9,9,11,0.5)',
-              }}
-              transition={{ duration: 0.25 }}
-              style={{ fontSize: '0.6rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em', border: '1px solid rgba(9,9,11,0.08)', padding: '3px 9px', borderRadius: '9999px' }}
+              animate={{ background: hovered ? s.accent : D }}
+              transition={{ duration: 0.3 }}
+              style={{ position: 'absolute', top: '1rem', right: '1rem', fontSize: '0.58rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#fff', padding: '3px 10px', borderRadius: '9999px' }}
             >
-              {t}
+              Popular
             </motion.span>
-          ))}
-        </div>
-      </motion.div>
+          )}
+
+          {/* ── Coloured icon box ── */}
+          <motion.div
+            animate={{
+              backgroundColor: hovered ? `rgba(${hexToRgb(s.accent)}, 0.14)` : 'rgba(9,9,11,0.04)',
+              borderColor:     hovered ? `rgba(${hexToRgb(s.accent)}, 0.45)` : 'rgba(9,9,11,0.08)',
+              boxShadow:       hovered ? `0 0 20px rgba(${hexToRgb(s.accent)}, 0.35), 0 0 6px rgba(${hexToRgb(s.accent)}, 0.2)` : '0 0 0 transparent',
+            }}
+            transition={{ duration: 0.35 }}
+            style={{
+              width: '46px', height: '46px', borderRadius: '13px',
+              border: '1px solid rgba(9,9,11,0.08)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: s.accent, flexShrink: 0,
+            }}
+          >
+            {s.icon}
+          </motion.div>
+
+          <div style={{ flex: 1 }}>
+            <motion.h3
+              animate={{ color: hovered ? s.accent : D }}
+              transition={{ duration: 0.25 }}
+              style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '1.0625rem', letterSpacing: '-0.02em', marginBottom: '0.5rem', lineHeight: 1.25 }}
+            >
+              {s.title}
+            </motion.h3>
+            <p style={{ fontSize: '0.8125rem', color: 'rgba(9,9,11,0.55)', lineHeight: 1.7 }}>{s.desc}</p>
+          </div>
+
+          {/* ── Coloured tags on hover ── */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem', paddingTop: '0.25rem' }}>
+            {s.tags.map(t => (
+              <motion.span
+                key={t}
+                animate={{
+                  borderColor: hovered ? `rgba(${hexToRgb(s.accent)}, 0.4)` : 'rgba(9,9,11,0.08)',
+                  color:       hovered ? s.accent : 'rgba(9,9,11,0.5)',
+                }}
+                transition={{ duration: 0.25 }}
+                style={{ fontSize: '0.6rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em', border: '1px solid rgba(9,9,11,0.08)', padding: '3px 9px', borderRadius: '9999px' }}
+              >
+                {t}
+              </motion.span>
+            ))}
+          </div>
+        </motion.div>
+      </Link>
     </FadeUp>
   );
 }
@@ -273,10 +288,12 @@ function Services() {
    COMPLETE SOLUTION
 ══════════════════════════════════════════════════ */
 const PILLARS = [
-  { num: '01', title: 'One team, full ownership',     body: 'No handoffs, no finger-pointing. Strategy, design, development, and growth live in the same room.' },
-  { num: '02', title: 'From idea to revenue',         body: "We don't just build and disappear. We scope, design, ship, and iterate until your product generates results." },
-  { num: '03', title: 'Human-first thinking',         body: 'Tech should feel invisible. We obsess over the experience your users actually have, not just the code behind it.' },
-  { num: '04', title: 'Outsource everything digital', body: 'Treat us as your embedded digital department. Dev, design, marketing, AI, cloud—dial up or down as you grow.' },
+  { num: '01', title: 'Prioritizing Client Needs',     body: 'We align every solution directly with your unique goals. Your success is our primary metric, and we adapt our process to fit your vision.' },
+  { num: '02', title: 'Open & Lifecycle Communication',body: 'We maintain complete, transparent, and open communication throughout the development cycle, ensuring you are never in the dark.' },
+  { num: '03', title: 'Feedback-Driven Iteration',    body: 'We welcome feedback with open arms. Your input is vital in refining the interface and mechanics to exceed your expectations.' },
+  { num: '04', title: 'Cutting-Edge Technologies',    body: 'We construct digital platforms utilizing high-performance, modern tech stacks to keep your systems fast, secure, and ready for growth.' },
+  { num: '05', title: 'Niche Veterinary Expertise',   body: 'We offer specialized development, branding, and marketing tailored for veterinary clinics, building trust with pet owners.' },
+  { num: '06', title: 'Ongoing Support & Maintenance', body: 'We stay on board after launch, delivering continuous updates, proactive security patches, and optimizations.' },
 ];
 
 function CompleteSolution() {

@@ -1,15 +1,15 @@
 'use client';
 import PageLayout from '@/components/layout/PageLayout';
 import { motion } from 'framer-motion';
-import { useState, useRef } from 'react';
+import { useState, useRef, Suspense } from 'react';
 import type { MouseEvent as ReactMouseEvent } from 'react';
 import { FadeUp } from '@/components/ui/ScrollReveal';
+import { useSearchParams } from 'next/navigation';
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 const B = '1px solid rgba(9,9,11,0.08)';
 const D = '#09090b';
 
-/* ── Contact methods ── */
 const METHODS = [
   {
     icon: (
@@ -18,8 +18,8 @@ const METHODS = [
       </svg>
     ),
     label: 'Email',
-    value: 'sabih0675@gmail.com',
-    href: 'mailto:sabih0675@gmail.com',
+    value: 'contact@devnexa.dev',
+    href: 'mailto:contact@devnexa.dev',
     accent: '#3b82f6',
   },
   {
@@ -40,8 +40,8 @@ const METHODS = [
       </svg>
     ),
     label: 'Location',
-    value: 'Lahore, Pakistan',
-    href: 'https://maps.google.com/?q=Lahore,Pakistan',
+    value: 'DHA Phase 2, Islamabad, Pakistan',
+    href: 'https://maps.google.com/?q=DHA+Phase+2,Islamabad,Pakistan',
     accent: '#ec4899',
   },
 ];
@@ -80,9 +80,7 @@ function ContactCard({ m }: { m: typeof METHODS[0] }) {
         position: 'relative', overflow: 'hidden',
       }}
     >
-      {/* spotlight */}
       <div aria-hidden style={{ position: 'absolute', inset: 0, pointerEvents: 'none', opacity: hovered ? 1 : 0, transition: 'opacity 350ms', background: `radial-gradient(200px circle at ${coords.x}% ${coords.y}%, rgba(${hexToRgb(m.accent)}, 0.1) 0%, transparent 65%)` }} />
-      {/* top glow */}
       <motion.div aria-hidden animate={{ opacity: hovered ? 1 : 0 }} transition={{ duration: 0.3 }} style={{ position: 'absolute', top: 0, left: '10%', right: '10%', height: '1.5px', background: `linear-gradient(90deg, transparent, ${m.accent}cc, transparent)`, pointerEvents: 'none' }} />
 
       <motion.div
@@ -107,16 +105,33 @@ function ContactCard({ m }: { m: typeof METHODS[0] }) {
   );
 }
 
-export default function ContactPage() {
+function ContactFormInner() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [isMock, setIsMock] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+
+  const searchParams = useSearchParams();
+  const rawService = searchParams.get('service') || '';
+  const rawProject = searchParams.get('project') || '';
+  const rawRole = searchParams.get('role') || '';
+
+  // Clean formatting for the context
+  const formatVal = (val: string) => val.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  const selectedContext = rawService
+    ? { type: 'Service', name: formatVal(rawService) }
+    : rawProject
+    ? { type: 'Project Case Study', name: formatVal(rawProject) }
+    : rawRole
+    ? { type: 'Career Role', name: formatVal(rawRole) }
+    : null;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus('sending');
     setErrorMessage('');
     setIsMock(false);
+    setFeedbackMessage('');
 
     const formData = new FormData(e.currentTarget);
     const data = {
@@ -125,10 +140,13 @@ export default function ContactPage() {
       company: formData.get('company'),
       budget: formData.get('budget'),
       message: formData.get('message'),
+      service: rawService ? formatVal(rawService) : undefined,
+      project: rawProject ? formatVal(rawProject) : undefined,
+      role: rawRole ? formatVal(rawRole) : undefined,
     };
 
     try {
-      const res = await fetch('/api/contact', {
+      let res = await fetch('/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -136,14 +154,66 @@ export default function ContactPage() {
         body: JSON.stringify(data),
       });
 
-      const result = await res.json();
+      // Fallback for Hostinger Static Hosting (where API routes return 404)
+      if (res.status === 404) {
+        console.warn('[DevNexa] API route not found (Static Hosting). Falling back to direct client-side Web3Forms submission.');
+        
+        const accessKey = '2ba6cd97-0e71-4358-aa3c-78162aa32215'; // Your Web3Forms key
+        const contextLine = data.service
+          ? `Service: ${data.service}`
+          : data.project
+          ? `Project reference: ${data.project}`
+          : data.role
+          ? `Role: ${data.role}`
+          : '';
 
-      if (!res.ok) {
-        throw new Error(result.error || 'Something went wrong. Please try again.');
+        const plainBody = [
+          `Name: ${data.name}`,
+          `Email: ${data.email}`,
+          `Company: ${data.company || '—'}`,
+          `Budget: ${data.budget || '—'}`,
+          contextLine,
+          '',
+          'Message:',
+          data.message,
+        ].filter(Boolean).join('\n');
+
+        const directRes = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({
+            access_key: accessKey,
+            subject: `New enquiry from ${data.name} (Direct Static Submission)`,
+            from_name: 'DevNexa Contact Form',
+            name: data.name,
+            email: data.email,
+            message: plainBody,
+          }),
+        });
+
+        const w3fData = await directRes.json();
+        if (directRes.ok && w3fData.success) {
+          setStatus('sent');
+          setIsMock(false);
+          return;
+        } else {
+          throw new Error(w3fData.message || 'Direct submission to Web3Forms failed.');
+        }
       }
 
-      if (result.isMock) {
-        setIsMock(true);
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const result = await res.json();
+        if (!res.ok) {
+          throw new Error(result.error || 'Something went wrong. Please try again.');
+        }
+        if (result.isMock) {
+          setIsMock(true);
+          setFeedbackMessage(result.message || 'Logged to server console.');
+        }
+      } else {
+        const text = await res.text();
+        throw new Error(text || `Server returned error status: ${res.status}`);
       }
       setStatus('sent');
     } catch (err: any) {
@@ -153,6 +223,84 @@ export default function ContactPage() {
     }
   };
 
+  return (
+    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+      
+      {/* Dynamic Context Header */}
+      {selectedContext && (
+        <div style={{
+          padding: '12px 16px',
+          borderRadius: '12px',
+          background: 'rgba(9,9,11,0.03)',
+          border: B,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          marginBottom: '0.5rem',
+        }}>
+          <span style={{
+            fontSize: '0.58rem',
+            fontFamily: 'var(--font-mono)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            background: D,
+            color: '#fff',
+            padding: '3px 8px',
+            borderRadius: '9999px',
+            fontWeight: 600,
+          }}>
+            {selectedContext.type}
+          </span>
+          <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: D }}>
+            {selectedContext.name}
+          </span>
+        </div>
+      )}
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }} className="form-row">
+        {[{ id: 'name', label: 'Full name', placeholder: 'Alex Johnson', type: 'text' }, { id: 'email', label: 'Work email', placeholder: 'alex@company.com', type: 'email' }].map(f => (
+          <div key={f.id}>
+            <label htmlFor={f.id} style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(9,9,11,0.5)', marginBottom: '8px' }}>{f.label}</label>
+            <input id={f.id} name={f.id} type={f.type} placeholder={f.placeholder} required suppressHydrationWarning style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: B, background: '#fff', fontFamily: 'var(--font-body)', fontSize: '0.9375rem', color: D, outline: 'none', transition: 'border-color 200ms' }} onFocus={e => e.target.style.borderColor = 'rgba(9,9,11,0.3)'} onBlur={e => e.target.style.borderColor = 'rgba(9,9,11,0.08)'} />
+          </div>
+        ))}
+      </div>
+
+      {[{ id: 'company', label: 'Company / project', placeholder: 'Acme Inc.', type: 'text' }, { id: 'budget', label: 'Estimated budget', placeholder: '$5,000 – $15,000', type: 'text' }].map(f => (
+        <div key={f.id}>
+          <label htmlFor={f.id} style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(9,9,11,0.5)', marginBottom: '8px' }}>{f.label}</label>
+          <input id={f.id} name={f.id} type={f.type} placeholder={f.placeholder} suppressHydrationWarning style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: B, background: '#fff', fontFamily: 'var(--font-body)', fontSize: '0.9375rem', color: D, outline: 'none', transition: 'border-color 200ms' }} onFocus={e => e.target.style.borderColor = 'rgba(9,9,11,0.3)'} onBlur={e => e.target.style.borderColor = 'rgba(9,9,11,0.08)'} />
+        </div>
+      ))}
+
+      <div>
+        <label htmlFor="message" style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(9,9,11,0.5)', marginBottom: '8px' }}>Message</label>
+        <textarea id="message" name="message" rows={6} placeholder="Tell us about your project, timeline, and goals..." required suppressHydrationWarning style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: B, background: '#fff', fontFamily: 'var(--font-body)', fontSize: '0.9375rem', color: D, outline: 'none', resize: 'vertical', transition: 'border-color 200ms' }} onFocus={e => e.target.style.borderColor = 'rgba(9,9,11,0.3)'} onBlur={e => e.target.style.borderColor = 'rgba(9,9,11,0.08)'} />
+      </div>
+
+      {status === 'error' && (
+        <div style={{ padding: '12px 16px', borderRadius: '10px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', fontSize: '0.875rem', lineHeight: 1.5 }}>
+          {errorMessage}
+        </div>
+      )}
+
+      {status === 'sent' && isMock && (
+        <div style={{ padding: '12px 16px', borderRadius: '10px', background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', color: '#d97706', fontSize: '0.875rem', lineHeight: 1.5 }}>
+          <strong>Mock Mode Active:</strong> {feedbackMessage}
+        </div>
+      )}
+
+      <button type="submit" disabled={status === 'sending' || status === 'sent'} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '14px 32px', borderRadius: '9999px', background: status === 'sent' ? '#10b981' : D, color: '#fff', fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '0.9375rem', letterSpacing: '-0.01em', border: 'none', cursor: (status === 'sending' || status === 'sent') ? 'default' : 'pointer', transition: 'background 300ms ease, transform 150ms ease' }}>
+        {status === 'idle' && <>Send message <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg></>}
+        {status === 'error' && <>Retry sending <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg></>}
+        {status === 'sending' && 'Sending…'}
+        {status === 'sent' && '✓ Message sent!'}
+      </button>
+    </form>
+  );
+}
+
+export default function ContactPage() {
   return (
     <PageLayout
       eyebrow="Get in touch"
@@ -164,49 +312,11 @@ export default function ContactPage() {
         <div className="dn-container">
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5rem', alignItems: 'start' }} className="contact-grid">
 
-            {/* Left — form */}
+            {/* Left — form inside Suspense to prevent build-time static generation issues with useSearchParams */}
             <FadeUp margin="-80px">
-              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }} className="form-row">
-                  {[{ id: 'name', label: 'Full name', placeholder: 'Alex Johnson', type: 'text' }, { id: 'email', label: 'Work email', placeholder: 'alex@company.com', type: 'email' }].map(f => (
-                    <div key={f.id}>
-                      <label htmlFor={f.id} style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(9,9,11,0.5)', marginBottom: '8px' }}>{f.label}</label>
-                      <input id={f.id} name={f.id} type={f.type} placeholder={f.placeholder} required suppressHydrationWarning style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: B, background: '#fff', fontFamily: 'var(--font-body)', fontSize: '0.9375rem', color: D, outline: 'none', transition: 'border-color 200ms' }} onFocus={e => e.target.style.borderColor = 'rgba(9,9,11,0.3)'} onBlur={e => e.target.style.borderColor = 'rgba(9,9,11,0.08)'} />
-                    </div>
-                  ))}
-                </div>
-
-                {[{ id: 'company', label: 'Company / project', placeholder: 'Acme Inc.', type: 'text' }, { id: 'budget', label: 'Estimated budget', placeholder: '$5,000 – $15,000', type: 'text' }].map(f => (
-                  <div key={f.id}>
-                    <label htmlFor={f.id} style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(9,9,11,0.5)', marginBottom: '8px' }}>{f.label}</label>
-                    <input id={f.id} name={f.id} type={f.type} placeholder={f.placeholder} suppressHydrationWarning style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: B, background: '#fff', fontFamily: 'var(--font-body)', fontSize: '0.9375rem', color: D, outline: 'none', transition: 'border-color 200ms' }} onFocus={e => e.target.style.borderColor = 'rgba(9,9,11,0.3)'} onBlur={e => e.target.style.borderColor = 'rgba(9,9,11,0.08)'} />
-                  </div>
-                ))}
-
-                <div>
-                  <label htmlFor="message" style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: '0.6rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(9,9,11,0.5)', marginBottom: '8px' }}>Message</label>
-                  <textarea id="message" name="message" rows={6} placeholder="Tell us about your project, timeline, and goals..." required suppressHydrationWarning style={{ width: '100%', padding: '12px 16px', borderRadius: '10px', border: B, background: '#fff', fontFamily: 'var(--font-body)', fontSize: '0.9375rem', color: D, outline: 'none', resize: 'vertical', transition: 'border-color 200ms' }} onFocus={e => e.target.style.borderColor = 'rgba(9,9,11,0.3)'} onBlur={e => e.target.style.borderColor = 'rgba(9,9,11,0.08)'} />
-                </div>
-
-                {status === 'error' && (
-                  <div style={{ padding: '12px 16px', borderRadius: '10px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', fontSize: '0.875rem', lineHeight: 1.5 }}>
-                    {errorMessage}
-                  </div>
-                )}
-
-                {status === 'sent' && isMock && (
-                  <div style={{ padding: '12px 16px', borderRadius: '10px', background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', color: '#d97706', fontSize: '0.875rem', lineHeight: 1.5 }}>
-                    <strong>Mock Mode Active:</strong> Your submission was logged to the terminal console. To receive actual emails in your inbox, add <code>WEB3FORMS_ACCESS_KEY</code> to your <code>.env.local</code> file and restart the development server. You can get a free key instantly at <a href="https://web3forms.com" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color: 'inherit' }}>web3forms.com</a>.
-                  </div>
-                )}
-
-                <button type="submit" disabled={status === 'sending' || status === 'sent'} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '14px 32px', borderRadius: '9999px', background: status === 'sent' ? '#10b981' : D, color: '#fff', fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '0.9375rem', letterSpacing: '-0.01em', border: 'none', cursor: (status === 'sending' || status === 'sent') ? 'default' : 'pointer', transition: 'background 300ms ease, transform 150ms ease' }}>
-                  {status === 'idle' && <>Send message <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg></>}
-                  {status === 'error' && <>Retry sending <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg></>}
-                  {status === 'sending' && 'Sending…'}
-                  {status === 'sent' && '✓ Message sent!'}
-                </button>
-              </form>
+              <Suspense fallback={<div>Loading form...</div>}>
+                <ContactFormInner />
+              </Suspense>
             </FadeUp>
 
             {/* Right — contact methods */}

@@ -2,18 +2,11 @@
 import PageLayout from '@/components/layout/PageLayout';
 import { FadeUp, StaggerList, StaggerItem } from '@/components/ui/ScrollReveal';
 import { motion } from 'framer-motion';
+import { PROJECTS_LIST, ProjectDetail } from '@/lib/projectsData';
+import Link from 'next/link';
 
 const B = '1px solid rgba(9,9,11,0.08)';
 const D = '#09090b';
-
-const PROJECTS = [
-  { tag: 'SaaS', accent: '#3b82f6', title: 'TalentFlow',      year: '2024', desc: 'End-to-end recruiting SaaS with applicant tracking, AI-powered resume parsing, and Stripe-billed subscriptions. 2,000+ active users at launch.', stack: ['Next.js', 'Supabase', 'Stripe', 'OpenAI'] },
-  { tag: 'E-Commerce', accent: '#10b981', title: 'NouraBoutique', year: '2024', desc: 'Premium fashion e-commerce store with a bespoke Figma design system, real-time inventory, and Google Shopping integration. 3× revenue in 6 months.', stack: ['Shopify', 'React', 'Figma', 'Google Ads'] },
-  { tag: 'AI', accent: '#f59e0b', title: 'DocuMind AI',      year: '2024', desc: 'Document intelligence platform that extracts, summarizes, and routes contracts using GPT-4 and n8n workflows. Cuts legal review time by 70%.', stack: ['Python', 'GPT-4', 'n8n', 'FastAPI'] },
-  { tag: 'Brand', accent: '#ec4899', title: 'Novu Labs',       year: '2023', desc: 'Full brand identity for a HealthTech startup — logo, design system, pitch deck, and Webflow site. Funded $1.2M seed round within 3 months.', stack: ['Figma', 'Webflow', 'Illustration', 'Motion'] },
-  { tag: 'Mobile', accent: '#8b5cf6', title: 'RideSync',       year: '2023', desc: 'Real-time carpooling app for corporate campuses. React Native, WebSockets for live tracking, and push notifications. 5,000 DAUs after beta.', stack: ['React Native', 'WebSockets', 'Firebase', 'Expo'] },
-  { tag: 'Marketing', accent: '#f97316', title: 'GrowthPulse',  year: '2023', desc: 'Performance marketing retainer for a B2B SaaS — Google + Meta ads, SEO content, and CRO. Lowered CAC by 42% and grew MRR from $12K to $85K.', stack: ['Google Ads', 'Meta Ads', 'SEO', 'HubSpot'] },
-];
 
 function hexToRgb(hex: string) {
   const h = hex.replace('#', '');
@@ -26,39 +19,44 @@ export default function OurWorkPage() {
       eyebrow="Portfolio"
       title="Work we're proud of."
       titleMuted="Results that speak."
-      subtitle="A curated selection of projects across web, mobile, SaaS, AI, branding, and growth — each one scoped, designed, and shipped in-house."
+      subtitle="A curated selection of projects across web, mobile, SaaS, AI, branding, and growth — each one scoped, designed, and shipped in-house. Click any card to explore the full case study."
     >
       <section className="section" style={{ background: '#faf9f6' }}>
         <div className="dn-container">
           <StaggerList stagger={0.06} margin="-80px" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem' }} className="work-grid">
-            {PROJECTS.map((p) => (
+            {PROJECTS_LIST.map((p) => (
               <StaggerItem key={p.title}>
-                <motion.div
-                  whileHover={{ y: -6, boxShadow: '0 20px 60px rgba(0,0,0,0.06)' }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 24 }}
-                  style={{ border: B, borderRadius: '20px', padding: '2.25rem', background: '#fff', position: 'relative', overflow: 'hidden', height: '100%' }}
-                >
-                  {/* Accent glow top */}
-                  <div aria-hidden style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: `linear-gradient(90deg, transparent, ${p.accent}, transparent)`, opacity: 0.7 }} />
-                  {/* Radial glow */}
-                  <div aria-hidden style={{ position: 'absolute', top: '-60px', right: '-60px', width: '200px', height: '200px', borderRadius: '50%', background: `radial-gradient(circle, rgba(${hexToRgb(p.accent)}, 0.1) 0%, transparent 70%)`, pointerEvents: 'none' }} />
+                <Link href={`/our-work/${p.slug}`} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
+                  <motion.div
+                    whileHover={{ y: -6, boxShadow: '0 20px 60px rgba(0,0,0,0.06)' }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+                    style={{ border: B, borderRadius: '20px', padding: '2.25rem', background: '#fff', position: 'relative', overflow: 'hidden', height: '100%', cursor: 'pointer' }}
+                  >
+                    {/* Accent glow top */}
+                    <div aria-hidden style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: `linear-gradient(90deg, transparent, ${p.accent}, transparent)`, opacity: 0.7 }} />
+                    {/* Radial glow */}
+                    <div aria-hidden style={{ position: 'absolute', top: '-60px', right: '-60px', width: '200px', height: '200px', borderRadius: '50%', background: `radial-gradient(circle, rgba(${hexToRgb(p.accent)}, 0.1) 0%, transparent 70%)`, pointerEvents: 'none' }} />
 
-                  <div style={{ position: 'relative', zIndex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: p.accent, border: `1px solid rgba(${hexToRgb(p.accent)}, 0.3)`, padding: '4px 10px', borderRadius: '9999px', background: `rgba(${hexToRgb(p.accent)}, 0.06)` }}>{p.tag}</span>
-                      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', letterSpacing: '0.1em', color: 'rgba(9,9,11,0.35)' }}>{p.year}</span>
+                    <div style={{ position: 'relative', zIndex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: p.accent, border: `1px solid rgba(${hexToRgb(p.accent)}, 0.3)`, padding: '4px 10px', borderRadius: '9999px', background: `rgba(${hexToRgb(p.accent)}, 0.06)` }}>{p.tag}</span>
+                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', letterSpacing: '0.15em', color: 'rgba(9,9,11,0.35)' }}>{p.year}</span>
+                      </div>
+
+                      <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.5rem', letterSpacing: '-0.03em', color: D, marginBottom: '0.75rem' }}>{p.title}</h3>
+                      <p style={{ fontSize: '0.9375rem', color: 'rgba(9,9,11,0.58)', lineHeight: 1.75, marginBottom: '1.75rem' }}>{p.desc}</p>
+
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        {p.stack.slice(0, 3).map(t => (
+                          <span key={t} style={{ fontSize: '0.62rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em', border: B, color: 'rgba(9,9,11,0.45)', padding: '4px 10px', borderRadius: '9999px' }}>{t}</span>
+                        ))}
+                        {p.stack.length > 3 && (
+                          <span style={{ fontSize: '0.62rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em', color: p.accent, padding: '4px 10px', fontWeight: 600 }}>+{p.stack.length - 3} more</span>
+                        )}
+                      </div>
                     </div>
-
-                    <h3 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.5rem', letterSpacing: '-0.03em', color: D, marginBottom: '0.75rem' }}>{p.title}</h3>
-                    <p style={{ fontSize: '0.9375rem', color: 'rgba(9,9,11,0.58)', lineHeight: 1.75, marginBottom: '1.75rem' }}>{p.desc}</p>
-
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                      {p.stack.map(t => (
-                        <span key={t} style={{ fontSize: '0.62rem', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em', border: B, color: 'rgba(9,9,11,0.45)', padding: '4px 10px', borderRadius: '9999px' }}>{t}</span>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
+                  </motion.div>
+                </Link>
               </StaggerItem>
             ))}
           </StaggerList>
@@ -73,10 +71,10 @@ export default function OurWorkPage() {
             <h2 style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: 'clamp(2rem, 4vw, 3.5rem)', letterSpacing: '-0.04em', color: D, marginBottom: '1rem' }}>
               Your project could be<br /><span style={{ color: 'rgba(9,9,11,0.28)' }}>the next case study.</span>
             </h2>
-            <a href="/contact" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 32px', borderRadius: '9999px', background: D, color: '#fff', fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '0.9375rem', textDecoration: 'none', marginTop: '1rem' }}>
+            <Link href="/contact" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 32px', borderRadius: '9999px', background: D, color: '#fff', fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '0.9375rem', textDecoration: 'none', marginTop: '1rem' }}>
               Start your project
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            </a>
+            </Link>
           </FadeUp>
         </div>
       </section>
